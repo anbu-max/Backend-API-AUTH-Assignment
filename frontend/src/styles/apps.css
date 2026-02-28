@@ -162,6 +162,15 @@
 
 .text-warning { color: var(--warning); }
 .text-success { color: var(--success); }
+.text-error { color: var(--error); }
+.text-muted { color: var(--text-muted); }
+
+.bg-success { background-color: var(--success); }
+.bg-warning { background-color: var(--warning); }
+.bg-error { background-color: var(--error); }
+.bg-muted { background-color: var(--text-muted); }
+
+.text-white { color: white !important; }
 
 .controls-bar {
   display: flex;
@@ -226,10 +235,74 @@
   cursor: pointer;
 }
 
+.filter-item select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 .task-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
   gap: 1.5rem;
+}
+
+.record-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.record-info h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.record-grade {
+  width: 120px;
+  text-align: center;
+}
+
+.record-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .record-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .record-grade, .record-actions {
+    width: 100%;
+    text-align: left;
+    justify-content: space-between;
+  }
 }
 
 .loading-container {
@@ -412,6 +485,16 @@
 .status-select:focus {
   border-color: var(--accent-primary);
 }
+
+.status-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.status-select option[value="enrolled"] { color: var(--text-muted); }
+.status-select option[value="probation"] { color: var(--warning); }
+.status-select option[value="graduated"] { color: var(--success); }
+.status-select option[value="suspended"] { color: var(--error); }
 
 /* Modal */
 .modal-overlay {

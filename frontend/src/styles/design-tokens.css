@@ -1,21 +1,21 @@
 :root {
   /* Colors */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
+  --bg-primary: #121212;   /* Matte Black */
+  --bg-secondary: #1e1e1e; /* Slightly lighter black */
+  --bg-tertiary: #2a2a2a;
   
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
   
-  --accent-primary: #6366f1;
-  --accent-secondary: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.5);
+  --accent-primary: #fbbf24; /* Golden Yellow */
+  --accent-secondary: #fcd34d;
+  --accent-glow: rgba(251, 191, 36, 0.3);
   
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  --success: #34d399;
+  --warning: #f59e0b; /* Golden Yellow for warnings too */
+  --error: #ef4444;   /* Red */
+  --info: #3b82f6;    /* Blue */
   
   /* Borders & Shadows */
   --border-subtle: rgba(255, 255, 255, 0.05);

@@ -1,188 +1,147 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import TaskCard from '../components/TaskCard';
-import TaskModal from '../components/TaskModal';
+import StudentRecordCard from '../components/StudentRecordCard';
+import StudentRecordModal from '../components/StudentRecordModal';
 import api from '../api';
-import { Plus, Filter, LayoutGrid, List, Search, SlidersHorizontal, Loader2 } from 'lucide-react';
+import { Plus, Search, Loader2, GraduationCap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
-  const [tasks, setTasks] = useState([]);
+  const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
-  const [filters, setFilters] = useState({
-    status: '',
-    priority: '',
-    search: ''
-  });
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    completed: 0
-  });
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [search, setSearch] = useState('');
+  const { user } = useAuth();
 
-  const fetchTasks = async () => {
+  const fetchRecords = async () => {
     try {
-      const { status, priority } = filters;
-      let url = '/tasks?limit=100';
-      if (status) url += `&status=${status}`;
-      if (priority) url += `&priority=${priority}`;
-      
-      const response = await api.get(url);
-      const fetchedTasks = response.data.data;
-      setTasks(fetchedTasks);
-      
-      // Calculate stats
-      const total = fetchedTasks.length;
-      const pending = fetchedTasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
-      const completed = fetchedTasks.filter(t => t.status === 'completed').length;
-      setStats({ total, pending, completed });
-      
+      const response = await api.get('/students?limit=100');
+      setRecords(response.data.data);
     } catch (error) {
-      toast.error('Failed to fetch tasks');
+      toast.error('Failed to fetch student records.');
+      setRecords([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, [filters.status, filters.priority]);
+    fetchRecords();
+  }, []);
 
-  const handleCreateOrUpdate = async (formData, taskId = null) => {
+  const handleCreateOrUpdate = async (formData, recordId = null) => {
     try {
-      if (taskId) {
-        await api.put(`/tasks/${taskId}`, formData);
-        toast.success('Task updated successfully');
+      if (recordId) {
+        await api.put(`/students/${recordId}`, formData);
+        toast.success('Record updated successfully');
       } else {
-        await api.post('/tasks', formData);
-        toast.success('Task created successfully');
+        await api.post('/students', formData);
+        toast.success('Record created successfully');
       }
-      fetchTasks();
+      fetchRecords();
     } catch (error) {
-      toast.error(error.response?.data?.error?.message || 'Action failed');
+      toast.error(error.response?.data?.error?.message || 'Action failed (Teachers only)');
     }
   };
 
-  const handleDelete = async (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
+  const handleDelete = async (recordId) => {
+    if (window.confirm('Are you sure you want to delete this student record?')) {
       try {
-        await api.delete(`/tasks/${taskId}`);
-        toast.success('Task deleted');
-        fetchTasks();
+        await api.delete(`/students/${recordId}`);
+        toast.success('Record deleted');
+        fetchRecords();
       } catch (error) {
-        toast.error('Failed to delete task');
+        toast.error('Failed to delete record (Teachers only)');
       }
     }
   };
 
-  const handleStatusChange = async (taskId, newStatus) => {
+  const handleGradeChange = async (recordId, newGrade) => {
     try {
-      await api.put(`/tasks/${taskId}`, { status: newStatus });
-      fetchTasks();
+      await api.put(`/students/${recordId}`, { grade: newGrade });
+      fetchRecords();
     } catch (error) {
-      toast.error('Failed to update status');
+      toast.error('Failed to update grade (Teachers only)');
     }
   };
 
-  const filteredTasks = tasks.filter(task => 
-    task.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-    task.description?.toLowerCase().includes(filters.search.toLowerCase())
+  const filteredRecords = records.filter(record => 
+    record.student_name.toLowerCase().includes(search.toLowerCase()) ||
+    record.student_id_number.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Removing the restricted dashboard view for students.
+  // The table below natively supports read-only mode for students by hiding the Action buttons.
   return (
     <div className="dashboard-page">
       <Navbar />
       
       <main className="container dashboard-main">
-        <header className="dashboard-header">
-          <div>
-            <h1>Your Workspace</h1>
-            <p>Welcome back! You have {stats.pending} active tasks.</p>
+        <header className="dashboard-header" style={{ position: 'relative', overflow: 'hidden', padding: '40px 20px', borderRadius: '12px', marginBottom: '20px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+          <img 
+            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop" 
+            alt="Dashboard Banner" 
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} 
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4))', zIndex: 1 }}></div>
+          <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <div style={{ background: 'var(--accent-primary)', padding: '12px', borderRadius: '50%' }}>
+                <GraduationCap size={44} color="white" />
+              </div>
+              <div>
+                <h1 style={{ color: 'white', marginBottom: '8px', fontSize: '2rem' }}>Student Directory</h1>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem' }}>Total Number of Students: {records.length}</p>
+              </div>
+            </div>
+            {user?.role === 'teacher' && (
+              <button 
+                onClick={() => { setEditingRecord(null); setIsModalOpen(true); }} 
+                className="btn btn-primary add-task-btn"
+                style={{ backgroundColor: 'var(--accent-primary)', border: 'none', padding: '10px 20px', fontSize: '1.05rem', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}
+              >
+                <Plus size={20} />
+                <span>Add Student</span>
+              </button>
+            )}
           </div>
-          <button onClick={() => { setEditingTask(null); setIsModalOpen(true); }} className="btn btn-primary add-task-btn">
-            <Plus size={20} />
-            <span>Create Task</span>
-          </button>
         </header>
-
-        <section className="stats-row">
-          <div className="stat-card glass">
-            <span className="stat-label">Total Tasks</span>
-            <span className="stat-value">{stats.total}</span>
-          </div>
-          <div className="stat-card glass">
-            <span className="stat-label">In Progress</span>
-            <span className="stat-value text-warning">{stats.pending}</span>
-          </div>
-          <div className="stat-card glass">
-            <span className="stat-label">Completed</span>
-            <span className="stat-value text-success">{stats.completed}</span>
-          </div>
-        </section>
 
         <section className="controls-bar">
           <div className="search-box">
             <Search className="search-icon" size={18} />
             <input 
               type="text" 
-              placeholder="Search tasks..." 
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              placeholder="Search by name or Student ID..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
-          
-          <div className="filter-group">
-            <div className="filter-item">
-              <Filter size={16} />
-              <select 
-                value={filters.status}
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              >
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-            
-            <div className="filter-item">
-              <SlidersHorizontal size={16} />
-              <select 
-                value={filters.priority}
-                onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-              >
-                <option value="">All Priority</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
-            </div>
           </div>
         </section>
 
         {loading ? (
           <div className="loading-container">
             <Loader2 className="animate-spin" size={48} color="var(--accent-primary)" />
-            <p>Loading tasks...</p>
+            <p>Loading directory...</p>
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
-            {filteredTasks.length > 0 ? (
+            {filteredRecords.length > 0 ? (
               <motion.div 
                 layout
                 className="task-grid"
               >
-                {filteredTasks.map(task => (
-                  <TaskCard 
-                    key={task._id} 
-                    task={task} 
-                    onEdit={(t) => { setEditingTask(t); setIsModalOpen(true); }}
+                {filteredRecords.map(record => (
+                  <StudentRecordCard 
+                    key={record._id} 
+                    record={record} 
+                    userRole={user?.role}
+                    onEdit={(r) => { setEditingRecord(r); setIsModalOpen(true); }}
                     onDelete={handleDelete}
-                    onStatusChange={handleStatusChange}
+                    onGradeChange={handleGradeChange}
                   />
                 ))}
               </motion.div>
@@ -192,19 +151,19 @@ const Dashboard = () => {
                 animate={{ opacity: 1 }}
                 className="empty-state glass"
               >
-                <h3>No tasks found</h3>
-                <p>Try adjusting your search or filters, or create a new task.</p>
+                <h3>No records found</h3>
+                <p>The directory is currently empty.</p>
               </motion.div>
             )}
           </AnimatePresence>
         )}
       </main>
 
-      <TaskModal 
+      <StudentRecordModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onSubmit={handleCreateOrUpdate}
-        task={editingTask}
+        record={editingRecord}
       />
     </div>
   );

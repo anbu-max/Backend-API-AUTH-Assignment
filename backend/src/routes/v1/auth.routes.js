@@ -16,11 +16,11 @@ router.post('/register', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role, adminCode } = req.body;
     if (!email || !password) {
       throw new ValidationError('Email and password required');
     }
-    const result = await AuthService.login(email, password);
+    const result = await AuthService.login(email, password, role, adminCode);
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);

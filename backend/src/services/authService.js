@@ -10,7 +10,21 @@ class AuthService {
   static BCRYPT_ROUNDS = 12;
   
   static async register(userData) {
-    const { email, username, password, firstName = '', lastName = '' } = userData;
+    const { email, password, firstName = '', lastName = '' } = userData;
+    let username = userData.username;
+    
+    // Auto-generate a username if not provided
+    if (!username || username.trim() === '') {
+      const baseString = `${firstName.toLowerCase().replace(/\s/g, '')}${lastName.toLowerCase().replace(/\s/g, '')}`;
+      username = baseString.length > 0 ? `${baseString}${Math.floor(Math.random() * 10000)}` : `user${Math.floor(Math.random() * 1000000)}`;
+    }
+
+    if (userData.role === 'teacher') {
+      const validAdminCode = env.get('ADMIN_REGISTRATION_CODE');
+      if (!userData.adminCode || userData.adminCode !== validAdminCode) {
+        throw new AuthenticationError('Invalid school password for teacher registration');
+      }
+    }
     
     AuthValidator.validateEmail(email);
     AuthValidator.validatePassword(password);
@@ -31,7 +45,7 @@ class AuthService {
       password_hash: passwordHash,
       first_name: firstName,
       last_name: lastName,
-      role: 'user'
+      role: ['student', 'teacher'].includes(userData.role) ? userData.role : 'student'
     });
 
     await user.save();
@@ -43,17 +57,32 @@ class AuthService {
     return { user: this.sanitizeUser(user), ...tokens };
   }
   
-  static async login(email, password) {
-    const user = await User.findOne({ email: email.toLowerCase(), is_active: true });
+  static async login(email, password, role, adminCode) {
+    const user = await User.findOne({ email: email.toLowerCase() });
     
     if (!user) {
-      throw new AuthenticationError('Invalid email or password');
+      throw new AuthenticationError("User doesn't exist. Please register first.");
+    }
+    
+    if (role && role !== user.role) {
+      throw new AuthenticationError("Role mismatch. Please select your correct role.");
+    }
+
+    if (user.role === 'teacher') {
+      const validAdminCode = env.get('ADMIN_REGISTRATION_CODE');
+      if (!adminCode || adminCode !== validAdminCode) {
+        throw new AuthenticationError('Invalid school password for teacher login');
+      }
+    }
+    
+    if (!user.is_active) {
+      throw new AuthenticationError('Account is inactive. Please contact admin.');
     }
     
     const isValid = await bcrypt.compare(password, user.password_hash);
     
     if (!isValid) {
-      throw new AuthenticationError('Invalid email or password');
+      throw new AuthenticationError('Invalid password. Please try again.');
     }
     
     user.last_login = Date.now();

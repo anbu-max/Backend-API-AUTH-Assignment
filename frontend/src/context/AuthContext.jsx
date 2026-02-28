@@ -18,19 +18,27 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, role, adminCode) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password, role, adminCode });
       const { data } = response.data;
       localStorage.setItem('token', data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
       return { success: true };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.error?.message || 'Login failed',
-      };
+      let errorMessage = 'Login failed. Please try again.';
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 503) {
+          errorMessage = '⚠️ Cannot connect to the database. Please try again in a moment.';
+        } else {
+          errorMessage = error.response.data?.error?.message || errorMessage;
+        }
+      } else if (error.request) {
+        errorMessage = '🔴 Network error: Cannot reach the server. Is the backend running?';
+      }
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -43,10 +51,18 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return { success: true };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.error?.message || 'Registration failed',
-      };
+      let errorMessage = 'Registration failed. Please try again.';
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 503) {
+          errorMessage = '⚠️ Cannot connect to the database. Please try again in a moment.';
+        } else {
+          errorMessage = error.response.data?.error?.message || errorMessage;
+        }
+      } else if (error.request) {
+        errorMessage = '🔴 Network error: Cannot reach the server. Is the backend running?';
+      }
+      return { success: false, error: errorMessage };
     }
   };
 

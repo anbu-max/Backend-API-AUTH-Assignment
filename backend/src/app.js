@@ -7,7 +7,7 @@ const { ApplicationError } = require('./exceptions/ApplicationError');
 
 const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/v1/auth.routes');
-const taskRoutes = require('./routes/v1/tasks.routes');
+const studentRoutes = require('./routes/v1/students.routes');
 
 class Application {
   constructor() {
@@ -18,8 +18,20 @@ class Application {
   }
   
   setupMiddleware() {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      env.get('FRONTEND_URL')
+    ].filter(Boolean);
+
     this.app.use(cors({
-      origin: env.get('FRONTEND_URL', 'http://localhost:5173'),
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true
     }));
     
@@ -39,7 +51,7 @@ class Application {
   setupRoutes() {
     this.app.use('/api/v1/health', healthRoutes);
     this.app.use('/api/v1/auth', authRoutes);
-    this.app.use('/api/v1/tasks', taskRoutes);
+    this.app.use('/api/v1/students', studentRoutes);
     
     this.app.use((req, res) => {
       res.status(404).json({ error: { message: 'Route not found' } });
@@ -50,6 +62,16 @@ class Application {
     this.app.use((err, req, res, next) => {
       if (err instanceof ApplicationError) {
         return res.status(err.statusCode).json(err.toJSON());
+      }
+      
+      if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
+        logger.error('Database connection failed:', err.message);
+        return res.status(503).json({ 
+          error: { 
+            message: 'Database connection failed. Please check your network or ensure your IP is whitelisted in MongoDB Atlas.', 
+            code: 'DB_CONNECTION_ERROR' 
+          } 
+        });
       }
       
       logger.error('Unhandled error:', err);

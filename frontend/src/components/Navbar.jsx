@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, CheckCircle2 } from 'lucide-react';
+import { LogOut, User, GraduationCap } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -8,8 +8,8 @@ const Navbar = () => {
     <nav className="navbar glass">
       <div className="container nav-content">
         <div className="nav-logo">
-          <CheckCircle2 color="var(--accent-primary)" size={24} />
-          <span>TaskFlow</span>
+          <GraduationCap color="var(--accent-primary)" size={28} />
+          <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Student Management</span>
         </div>
         
         <div className="nav-actions">

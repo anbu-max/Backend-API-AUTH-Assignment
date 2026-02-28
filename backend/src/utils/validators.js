@@ -36,8 +36,8 @@ class AuthValidator {
       throw new ValidationError('Password must contain number');
     }
     
-    if (!/[!@#$%^&*]/.test(password)) {
-      throw new ValidationError('Password must contain special character');
+    if (!/[!@#$%^&*._-]/.test(password)) {
+      throw new ValidationError('Password must contain special character (!@#$%^&*._-)');
     }
   }
   

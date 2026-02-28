@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema({
   last_name: String,
   role: { 
     type: String, 
-    enum: ['user', 'admin'], 
-    default: 'user' 
+    enum: ['student', 'teacher', 'user', 'admin'], 
+    default: 'student' 
   },
   is_active: { type: Boolean, default: true },
   last_login: Date,
@@ -18,9 +18,8 @@ const userSchema = new mongoose.Schema({
 });
 
 // Auto-update timestamp on save
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function() {
   this.updated_at = Date.now();
-  next();
 });
 
 module.exports = mongoose.model('User', userSchema);
