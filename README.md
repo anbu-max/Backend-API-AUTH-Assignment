@@ -1,63 +1,105 @@
-# 🎓 Harvard School of Business: Student Management System
+# Student Management System
 
-A premium, production-ready student management application built with Node.js, Express, MongoDB, and React. This project demonstrates enterprise-level patterns, including role-based access control (Teachers vs Students), centralized authentication, and a dynamic, responsive UI.
+A comprehensive school portal and student management system built with the MERN stack (MongoDB, Express, React, Node.js). It provides a secure environment for teachers to manage student records and for students to view their profiles.
 
-## ✨ Key Features
+## Features
 
-- **Full-Stack Integration**: Seamless communication between React frontend and Node.js backend.
-- **Self-Healing Error System**: Centralized error middleware that categorizes and formats all application errors.
-- **Premium UI/UX**: High-performance React interface with glassmorphism, Framer Motion animations, and real-time toast notifications.
-- **Secure Authentication**: JWT-based auth with Role-Based Access Control (RBAC) ensuring only Teachers can manage records.
-- **Advanced Directory Management**: CRUD operations for student records with academic performance tracking, enrollment statuses, and live search.
-- **Unified Workspace**: Single-command startup for both frontend and backend.
+*   **Role-Based Access Control:** Distinct roles for Students and Teachers (Admins).
+*   **Teacher/Admin Portal:** Teachers can create, view, update, and delete student records.
+*   **Student Portal:** Students have read-only access to their own information.
+*   **Secure Authentication:** JWT-based user authentication.
+*   **Teacher Registration Verification:** Specialized "School Password" requirement for creating Teacher accounts.
 
-## 🏗️ Technology Stack
+## Prerequisites
 
-- **Frontend**: React (Vite), Framer Motion, Lucide Icons, Axios.
-- **Backend**: Node.js, Express.js, Mongoose.
-- **Database**: MongoDB.
-- **Security**: JWT (JsonWebToken), BcryptJS.
+*   Node.js (v18 or higher recommended)
+*   MongoDB (local or Atlas)
 
-## 🚀 Quick Start
+## Installation
 
-### Prerequisites
-- Node.js (v18+)
-- MongoDB (Local or Atlas)
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/anbu-max/Backend-API-AUTH-Assignment.git
+    cd Backend-API-AUTH-Assignment
+    ```
 
-### 1. Setup Environment
-**Backend**: Create `backend/.env`
+2.  **Install Backend Dependencies**
+    ```bash
+    cd backend
+    npm install
+    ```
+
+3.  **Install Frontend Dependencies**
+    ```bash
+    cd ../frontend
+    npm install
+    ```
+
+## Configuration
+
+To run the project, you'll need to configure `.env` files for both the frontend and backend. 
+
+### Backend Environment Variables (`backend/.env`)
+
+Create a `.env` file in the `backend` directory:
+
 ```env
-MONGODB_URL=your_mongodb_connection_string
-JWT_SECRET=your_32_char_secret_key_!@#$%^&*()
 PORT=3000
+MONGODB_URL=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRY=7d
+NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
+ADMIN_REGISTRATION_CODE=your_secret_admin_code
 ```
 
-### 2. Install & Start
-From the project root:
-```bash
-# Install all dependencies
-npm run install-all
+**Crucial:** The `ADMIN_REGISTRATION_CODE` variable serves as the "School Password". Anyone attempting to register or login as a Teacher will need to know this code. 
 
-# Start both servers (Frontend + Backend)
-npm start
+### Frontend Environment Variables (`frontend/.env`)
+
+Create a `.env` file in the `frontend` directory:
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
 ```
-The app will be live at [http://localhost:5173](http://localhost:5173).
 
-## 📡 API Architecture
+## Running the Application
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/register` | Register new user |
-| POST | `/api/v1/auth/login` | Login and get token |
-| GET | `/api/v1/students` | Get student directory (with filters) |
-| POST | `/api/v1/students` | Add new student to directory |
-| PUT | `/api/v1/students/:id` | Update student status/performance |
-| DELETE | `/api/v1/students/:id` | Remove student record |
+1.  **Start the Backend Server**
+    ```bash
+    cd backend
+    npm start
+    # The API will run on http://localhost:3000
+    ```
 
-## 🧪 Interview Highlights
+2.  **Start the Frontend Client**
+    ```bash
+    cd frontend
+    npm run dev
+    # The application will be accessible at http://localhost:5173
+    ```
 
-During implementation, focus was placed on:
-1. **Clean Code**: Layered architecture (Controllers, Services, Models).
-2. **Resilience**: Centralized `ApplicationError` class for consistent API responses.
-3. **UX**: Minimizing layout shift and providing immediate feedback for all CRUD operations.
+## Usage: Registration & Login
+
+### Registering as a Student
+1. Navigate to the Registration page.
+2. Fill out your details (First Name, Last Name, Email, Password).
+3. Select "Student" from the role dropdown.
+4. Click "Create Account".
+
+### Registering as a Teacher (Admin)
+1. Navigate to the Registration page.
+2. Fill out your details.
+3. Select "Teacher (Admin)" from the role dropdown.
+4. An additional "School Password" field will appear. 
+5. Enter the exact string corresponding to the `ADMIN_REGISTRATION_CODE` in your backend `.env` file.
+6. Click "Create Account".
+
+### Logging In
+The login process relies on the identical mechanism. A Teacher must provide the "School Password" during login to ensure elevated credentials are not misused.
+
+## Uninstalling/Deleting Everything 
+
+If you wish to fully remove the software and the database:
+1.  **Delete the Directory:** Delete the `Backend-API-AUTH-Assignment` folder from your system.
+2.  **Clear the Database:** If using MongoDB Atlas, log into your Atlas interface and drop the `assignment_db` database (or whichever path/name you specifically configured). If running locally, you can use a tool like MongoDB Compass to drop the database.
