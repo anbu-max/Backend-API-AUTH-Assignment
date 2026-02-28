@@ -1,12 +1,20 @@
 # Student Management System
 
+<div align="center">
+  <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Express.js-404D59?style=for-the-badge" alt="Express.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+</div>
+
 A comprehensive school portal and student management system built with the MERN stack (MongoDB, Express, React, Node.js). It provides a secure environment for teachers to manage student records and for students to view their profiles.
 
 ## Features
 
 *   **Role-Based Access Control:** Distinct roles for Students and Teachers (Admins).
 *   **Teacher/Admin Portal:** Teachers can create, view, update, and delete student records.
-*   **Student Portal:** Students have read-only access to their own information.
+*   **Student Portal:** Students have read-only access to view every student's grades and information, fostering transparency within the academic environment.
 *   **Secure Authentication:** JWT-based user authentication.
 *   **Teacher Registration Verification:** Specialized "School Password" requirement for creating Teacher accounts.
 
