@@ -141,8 +141,7 @@ The platform exposes a highly organized, standard RESTful API structure mapped d
 
 ## Key Deliverables Completed
 1. Fully functional Authentication APIs (Register/Login).
-2. Complete CRUD API operations constructed specifically for the Student Management dashboard. 
-3. Included API documentation file in the repository (see Postman Collection inside the Git history or code structure).
+2. Complete CRUD API operations constructed specifically for the Student Management dashboard.
 
 ## Uninstalling/Deleting Everything 
 
