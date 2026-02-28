@@ -110,19 +110,22 @@ The login process relies on the identical mechanism. A Teacher must provide the 
 
 The backend API is designed following RESTful principles, featuring robust security and scalable architecture. Let's break down the technical core:
 
-### REST API Operations
-The platform utilizes standard HTTP methods corresponding to CRUD operations:
-*   **POST:** Used for user registration, user login, and for creating new student records.
-*   **GET:** Used to securely retrieve the list of all students or an individual student's details.
-*   **PUT / PATCH:** Employed to update existing student properties and metadata. 
-*   **DELETE:** Facilitates the removal of student records from the database.
+### Complete RESTful API Design
+The platform exposes a highly organized, standard RESTful API structure mapped directly to HTTP verbs.
+*   **`POST /api/v1/auth/register` & `/login`:** Securely creates user sessions or registers new entities. 
+*   **`GET /api/v1/students`:** Retrieves a comprehensive list of all student records. Protected by JWT.
+*   **`GET /api/v1/students/:id`:** Dynamically queries the NoSQL database for specific parameter-driven records.
+*   **`PUT /api/v1/students/:id`:** Replaces or updates the attributes of an existing student. Role protected.
+*   **`DELETE /api/v1/students/:id`:** Removes records permanently. Restricted exclusively to the Teacher (Admin) role.
 
-### Core Security & Authentication
-*   **Role-Based Access Control (RBAC):** Firm division in API accessibility between the "student" role (read-only self-data) and the "teacher / admin" role (full access CRUD panel + specific school passwords).
-*   **JWT Token Handling:** API routes are guarded continuously by secure JWT token verification. Access tokens dictate immediate access while ensuring robust payload validation per session.
-*   **Password Hashing:** Passwords are never stored in plain text. Secure `bcrypt` hashing ensures industry-standard encryption standards from registration to login verification.
-*   **Input Sanitization:** Critical database queries restrict MongoDB injections and perform strict input validation across data types before entry.
-*   **Error Handling & Validation:** Global error handling securely catches failed processes (like a 500 DB connection error) safely reporting user-friendly status codes (e.g. 400 Bad Request) paired with concise descriptions, never leaking critical server stack traces.
+### Enterprise-Grade Security & Authentication Management
+*   **Cryptographic Password Hashing (Bcrypt):** Passwords are fully abstracted from the database. The system utilizes `bcrypt.js` with a high computational salt round (factor 12) during user registration. On `login`, strictly `bcrypt.compare()` is executed, verifying hash equivalence to prevent timing attacks.
+*   **Advanced JWT Execution:** JWT (JSON Web Tokens) orchestrates the entire session lifecycle smoothly statelessly. 
+    *   **Generation:** Upon passing the `bcrypt` verification, an `accessToken` is cryptographically signed using a secure `JWT_SECRET`. The payload specifically embeds the user's `_id` and `role`.
+    *   **Middleware Verification:** Every protected route is shielded by an `auth.middleware.js` layer. It parses the `Authorization: Bearer <token>` header, verifies the signature, and mounts the decoded user onto the request pipeline (`req.user`), rejecting malicious or expired requests with an instant `401 Unauthorized`.
+*   **Role-Based Access Control (RBAC):** Not all tokens are created equal. Secondary middleware checks the resolved token's `role`. While "Students" pass the auth check, only "Teachers" bypass the role-guard strictly applied over `POST`, `PUT`, and `DELETE` paths. 
+*   **Strict Input Validation & Sanitization:** Routes leverage dedicated validation utilities (`validators.js`) verifying email regex parameters and enforcing strict type checking prior to executing Mongoose queries. This effectively mitigates primitive MongoDB NoSQL injection attempts.
+*   **Centralized Error Handling:** Core application errors subclass natively to custom mappings (e.g. `AuthenticationError`, `ValidationError`). A global express error catcher intercepts any uncaught failure, preventing catastrophic crashes and filtering internal system logs from being exposed in public `500` status responses.
 
 ### Project Structure & Scalability
 *   **Scalable Modular Sructure:** The node project is functionally layered into `routes`, `controllers`, `services`, and `models`. Each database entity holds its own segmented logic which makes it incredibly simple to add new systems, such as a future "Assignments" or "Classes" module seamlessly.
