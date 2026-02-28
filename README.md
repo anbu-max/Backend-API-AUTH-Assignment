@@ -129,6 +129,13 @@ The platform utilizes standard HTTP methods corresponding to CRUD operations:
 *   **Database Schema:** The MongoDB schemas utilize strict `Mongoose` validations with clean types, unique constraints and dynamic hooks to ensure perfectly uniform, indexable database layouts. 
 *   **API Versioning:** All endpoints are strictly nested under `/api/v1/` to respect backwards compatibility when new upgrades are rolled out.
 
+### Frontend Architecture & Libraries
+*   **React & Vite Ecosystem:** Built on top of React 19 for maximum performance and lightning-fast HMR and build times provided seamlessly by Vite.
+*   **State Management & Routing:** Leverages secure React Context API for application-wide authentication state and `react-router-dom` for robust client-side routing and protected boundaries.
+*   **UI & Animations:** Designed with highly interactive UI aesthetics using vanilla CSS modules, `lucide-react` for beautifully consistent iconography, and `framer-motion` for complex page transitions and micro-animations.
+*   **HTTP Interactions:** `axios` powers structured and cleanly formatted async HTTP requests back and forth from the Node.js backend to ensure smooth JSON data streaming.
+*   **Toast Notifications:** Features `react-hot-toast` to provide instant, stylish visual feedback loops directly to users after API interactions (success/failure metrics).
+
 ## Key Deliverables Completed
 1. Fully functional Authentication APIs (Register/Login).
 2. Complete CRUD API operations constructed specifically for the Student Management dashboard. 
