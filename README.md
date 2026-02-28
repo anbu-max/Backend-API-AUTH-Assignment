@@ -98,6 +98,34 @@ VITE_API_URL=http://localhost:3000/api/v1
 ### Logging In
 The login process relies on the identical mechanism. A Teacher must provide the "School Password" during login to ensure elevated credentials are not misused.
 
+## Technical Architecture & Implementation Details
+
+The backend API is designed following RESTful principles, featuring robust security and scalable architecture. Let's break down the technical core:
+
+### REST API Operations
+The platform utilizes standard HTTP methods corresponding to CRUD operations:
+*   **POST:** Used for user registration, user login, and for creating new student records.
+*   **GET:** Used to securely retrieve the list of all students or an individual student's details.
+*   **PUT / PATCH:** Employed to update existing student properties and metadata. 
+*   **DELETE:** Facilitates the removal of student records from the database.
+
+### Core Security & Authentication
+*   **Role-Based Access Control (RBAC):** Firm division in API accessibility between the "student" role (read-only self-data) and the "teacher / admin" role (full access CRUD panel + specific school passwords).
+*   **JWT Token Handling:** API routes are guarded continuously by secure JWT token verification. Access tokens dictate immediate access while ensuring robust payload validation per session.
+*   **Password Hashing:** Passwords are never stored in plain text. Secure `bcrypt` hashing ensures industry-standard encryption standards from registration to login verification.
+*   **Input Sanitization:** Critical database queries restrict MongoDB injections and perform strict input validation across data types before entry.
+*   **Error Handling & Validation:** Global error handling securely catches failed processes (like a 500 DB connection error) safely reporting user-friendly status codes (e.g. 400 Bad Request) paired with concise descriptions, never leaking critical server stack traces.
+
+### Project Structure & Scalability
+*   **Scalable Modular Sructure:** The node project is functionally layered into `routes`, `controllers`, `services`, and `models`. Each database entity holds its own segmented logic which makes it incredibly simple to add new systems, such as a future "Assignments" or "Classes" module seamlessly.
+*   **Database Schema:** The MongoDB schemas utilize strict `Mongoose` validations with clean types, unique constraints and dynamic hooks to ensure perfectly uniform, indexable database layouts. 
+*   **API Versioning:** All endpoints are strictly nested under `/api/v1/` to respect backwards compatibility when new upgrades are rolled out.
+
+## Key Deliverables Completed
+1. Fully functional Authentication APIs (Register/Login).
+2. Complete CRUD API operations constructed specifically for the Student Management dashboard. 
+3. Included API documentation file in the repository (see Postman Collection inside the Git history or code structure).
+
 ## Uninstalling/Deleting Everything 
 
 If you wish to fully remove the software and the database:
